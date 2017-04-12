@@ -1,5 +1,12 @@
 package Pack_Simu;
 
+/**
+ * Classe Model
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ *
+ */
 public class Model {
 	
 	private int carLength;
@@ -9,6 +16,15 @@ public class Model {
 	private double clientSpeedMean;
 	private double clientRealSpeedMean;
 	
+	public Model(int cLength, int sLength) {
+		this.carLength = cLength;
+		this.streetLength = sLength;
+		this.carSpeedMean = 0 ;
+		this.clientSpeedSum = 0 ;
+		this.clientSpeedMean = 0 ;
+		this.clientRealSpeedMean = 0 ;
+	}
+
 	public double getClientRealSpeedMean() {
 		return clientRealSpeedMean;
 	}

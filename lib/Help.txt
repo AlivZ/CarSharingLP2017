@@ -1,0 +1,33 @@
+Cliquer sur le carré blanc pour placer des clients (clique gauche) et des voitures (clique droit).
+Le premier clique gauche correspond à la position du client et le deuxième à sa destination.
+Pour modifier une position, effectuer un cliquer-glisser avec le bouton de la souris correspondant (gauche pour les clients, droit pour les voitures).
+Pour supprimer un client ou une voiture, cliquer-glisser en dehors du carré blanc, toujours avec le bon bouton.
+Pour tout effacer, cliquer sur le boutton "Clear".
+
+Cliquer sur "Start" pour démarrer la simulation.
+Vous pouvez à tout moment mettre la simulation sur pause en cliquant sur "Pause". Vous pouvez également régler la vitesse de la simulation quand vous voulez grâce au slider de droite. Un spinner permet de régler le nombre maximum de clients que peut transporter une voiture en même temps.
+Il est également possible de régler la taille des blocks constituant la ville.
+
+Comme il s'agit d'un logiciel de covoiturage dynamique, vous pouvez ajouter des clients et des voitures pendant la simulation.
+Si celle-ci n'est pas sur pause, l'algorithme recalculera automatiquement le parcours.
+
+Avant le démarrage d'une simulation, vous pouvez sélectionner l'algorithme d'optimisation ainsi que le paramêtre de la fonction de coût à minimiser correspondant à la préférence pour la satisfiabilité du client.
+
+Vous pouvez afficher la dernière simulation démarrée en sélectionnant "Dernière simulation" puis en cliquant sur le bouton "Afficher".
+Vous avez la possibilité d'enregistrer une simulation (cliquez sur "Enregistrer" lorsque "Dernière simulation" est sélectionnée), que vous pouvez réafficher, modifier et supprimer à souhait.
+
+Pour introduire automatiquement de nouveaux usagers de la route cochez la case correspondante, en indiquant la période ainsi que la probabilité de préférence pour le systême de covoiturage dynamique. La voiture des usagers qui n'utilisent pas le systême de covoiturage est de couleur verte et leur destination de couleur bleu cyan.
+
+Cliquer sur le bouton "données" pour visualiser quelques données numériques de la simulation.
+
+Les paramêtres par défaut sont les paramêtres sélectionnés au démarrage de l'application. Vous pouvez les modifier, aprês avoir sélectionné "Paramêtres par défaut", puis en enregistrant.
+
+Les raccourcis claviers sont les suivants :
+F1 : Start
+F2 : Clear
+F3 : Données
+F4 : Quitter
+F5 : Afficher
+F6 : Supprimer
+F7 : Enregistrer
+F12 : Instructions"

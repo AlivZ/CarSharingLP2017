@@ -2,15 +2,31 @@ package Pack_Genetique;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Membre {
+/**
+ * 
+ * @author Romain Duret
+ * @version Build III -  v0.1
+ * @since Build III -  v0.0
+ */
+public class PassagerOnVoiture {
 	
+	/**
+	 * Matrice de passagers
+	 */
 	Passager[][] passagersOrdonnes = new Passager[5][4];
+	/**
+	 * Matrice de point de passage <br>
+	 * M(i,2*j)
+	 */
 	Point[][] pointsDePassage = new Point[5][8];
-	// Cache
 	private int competence = 0;
 	
-    // Create a random member
-    public void generateMembre() {
+    /** 
+     * Create a random passager group
+     * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+     */
+    public void generatePassagerOnVoiture() {
     	//on repartit aléatoirement les 20 passagers dans les 5 voitures
     	
     	Passager[] listeDesPassagers= new Passager[20];
@@ -24,11 +40,16 @@ public class Membre {
 				index++;
 			}
 		
-    	//Pour chaque voiture on attribue l'ordre de passage à chaque départ et déstination de chaque passager
 		this.attribuerPointsDePassage();
 		}
 
-		
+	/**
+	 * Pour chaque voiture on attribue l'ordre de passage à chaque départ et déstination de chaque passager
+	 * <br>
+	 * Effectué dans l'ordre "normale" (pas de dépot avant
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
     public void attribuerPointsDePassage() {
 		Point[] listeDesPoints = new Point[8];
 		int index;
@@ -45,10 +66,7 @@ public class Membre {
 			for(int j = 0; j < 8; j++){
 				pointsDePassage[i][j] = listeDesPoints[j];
 			}
-		
-	}
-
-
+		}
 	}
  
     /* Getters and setters */
@@ -69,14 +87,37 @@ public class Membre {
     public int nbVoitures() {
         return passagersOrdonnes.length;
     }
- 
-    public int getCompetence() {
-        competence = Resultat.getResultat(this);
-        return competence;
+    
+    /**
+     *  Trouver le resultat d'un GroupePassager, la somme des distances entre le 1er et le 2nd, puis le 2nd et le 3ème.... 
+     * @param GroupePassager
+     * @return
+     * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+     */
+    public int getDistanceChemin() {
+    	int resultat = 0;
+        int distanceEntreDeuxPoints = 0;
+        
+        /* si la voiture part de (0,0)
+        distanceEntreDeuxPoints += Math.abs(GroupePassager.pointsDePassage[0][0].getPos_y());
+    	distanceEntreDeuxPoints += Math.abs(GroupePassager.pointsDePassage[0][0].getPos_x());
+    	resultat += distanceEntreDeuxPoints;
+         */
+        for (int i = 0; i < this.pointsDePassage.length - 1 ; i++){
+            for (int j = 0; j < this.pointsDePassage[i].length - 1 ; j++){
+        	distanceEntreDeuxPoints = 0;
+        	distanceEntreDeuxPoints += Math.abs(this.pointsDePassage[i][j].getPos_y() - this.pointsDePassage[i][j+1].getPos_y());
+        	distanceEntreDeuxPoints += Math.abs(this.pointsDePassage[i][j].getPos_x() - this.pointsDePassage[i][j+1].getPos_x());
+        	resultat += distanceEntreDeuxPoints;
+            }
+        }
+    	
+        return resultat;
     }
  
 
-    public void afficherMembres() {
+    public void afficherPassagerOnVoitures() {
 		for(int i = 0 ; i < 5 ; i++){
 			for(int j = 0 ; j < 4 ; j++){
 				System.out.print(passagersOrdonnes[i][j].getId() + " ");
@@ -84,6 +125,7 @@ public class Membre {
 		System.out.println("");
 		}
      }
+    
     public void afficherPoints() {
 		for(int i = 0 ; i < 5 ; i++){
 			for(int j = 0 ; j < 8 ; j++){

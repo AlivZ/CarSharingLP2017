@@ -2,124 +2,147 @@ package Pack_Genetique;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * Classe qui permet de gérer l'Algorithme Génétique
+ * 
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Algo_Genetique {
  
     /* Paramètres de l'algo */
     private static final double chanceDeCroisement = 0.8;
     private static final double mutationRate = 0.08;
     private static final int tournamentSize = 3;
+
  
-    /* Méthodes publiques */
- 
-    // Evoluer la population
+    /**
+     * Evoluer la population : <br>
+     * On garde le meilleur Groupe, on créer un nouveau groupe de passager <br>
+     * On croise
+     * et on mute 
+     * @param pop Population (voitures)
+     * @return
+     * @version Build III -  v0.0
+     * @since Build III -  v0.0
+     */
     public static Population evolvePopulation(Population pop) {
         Population newPopulation = new Population(pop.size(), false);
         
  
-        // Garder le meilleur membre
-        newPopulation.saveMembre(0, pop.getMoreCompetent());
+        // Garder le meilleur PassagerOnVoiture
+        newPopulation.savePassagerOnVoiture(0, pop.getMoreCompetent());
         int elitismOffset = 1;
       
         // Loop over the population size and create new member with
         // Select new population
         for (int i = elitismOffset; i < pop.size(); i++) {
-        	Membre newMembre = selection(pop, pop.getMembre(i));
-            newPopulation.saveMembre(i, newMembre);
+        	PassagerOnVoiture newPassagerOnVoiture = selection(pop, pop.getPassagerOnVoiture(i));
+            newPopulation.savePassagerOnVoiture(i, newPassagerOnVoiture);
         }
         
         //Crossover
         for (int i = elitismOffset; i < newPopulation.size(); i++) {
-            croisement(newPopulation.getMembre(i));
+            croisement(newPopulation.getPassagerOnVoiture(i));
         }
         
         // Mutate population
         for (int i = elitismOffset; i < newPopulation.size(); i++) {
-            mutation(newPopulation.getMembre(i));
+            mutation(newPopulation.getPassagerOnVoiture(i));
         }
         
         for (int i = elitismOffset; i < newPopulation.size(); i++) {
-        	newPopulation.getMembre(i).attribuerPointsDePassage();
+        	newPopulation.getPassagerOnVoiture(i).attribuerPointsDePassage();
         }
 
         return newPopulation;
     }
     
-    // Crossover of members
-    private static void croisement(Membre membre) {
+    /**
+     * Croisement des voitures.
+     * @param PassagerOnVoiture
+     */
+    private static void croisement(PassagerOnVoiture PassagerOnVoiture) {
     	int nbSwap = (int)(Math.random() * 2 + 1); 
 
-        for (int i = 0; i < membre.nbVoitures(); i++) 
+        for (int i = 0; i < PassagerOnVoiture.nbVoitures(); i++) 
         	if (Math.random() <= chanceDeCroisement)
-        			swapPassagers(membre, i, nbSwap);
+        			swapPassagers(PassagerOnVoiture, i, nbSwap);
 
     } 
     
-	private static void swapPassagers(Membre membre, int numVoiture, int nbSwap) {	
+	private static void swapPassagers(PassagerOnVoiture PassagerOnVoiture, int numVoiture, int nbSwap) {	
 		if(nbSwap == 1){
-			 Collections.swap(Arrays.asList(membre.passagersOrdonnes[numVoiture]), 0, 3);
+			 Collections.swap(Arrays.asList(PassagerOnVoiture.passagersOrdonnes[numVoiture]), 0, 3);
 		} 
 		 else if(nbSwap == 2){
-			Collections.swap(Arrays.asList(membre.passagersOrdonnes[numVoiture]), 0, 2);
-			Collections.swap(Arrays.asList(membre.passagersOrdonnes[numVoiture]), 1, 3);
+			Collections.swap(Arrays.asList(PassagerOnVoiture.passagersOrdonnes[numVoiture]), 0, 2);
+			Collections.swap(Arrays.asList(PassagerOnVoiture.passagersOrdonnes[numVoiture]), 1, 3);
 		}
 		
 	}
 
 	// Selection members
-    private static Membre selection(Population pop, Membre membre) {
-        Membre newMember = new Membre();
+    private static PassagerOnVoiture selection(Population pop, PassagerOnVoiture PassagerOnVoiture) {
+        PassagerOnVoiture newMember = new PassagerOnVoiture();
         newMember = tournamentSelection(pop);
         return newMember;
     }
  
     // Mutate a member
-    private static void mutation(Membre membre) {
+    private static void mutation(PassagerOnVoiture PassagerOnVoiture) {
         // Loop through passagers
-        for (int i = 0; i < membre.nbVoitures(); i++) {
-        	for (int j = 0; j < membre.nbPassagers(); j++){
+        for (int i = 0; i < PassagerOnVoiture.nbVoitures(); i++) {
+        	for (int j = 0; j < PassagerOnVoiture.nbPassagers(); j++){
         		if (Math.random() <= mutationRate) {
         			// Swap two random passagers
-        			randomSwapPassagers(membre);
+        			randomSwapPassagers(PassagerOnVoiture);
         		}
             }
         }
     }
     
-    
-    private static void randomSwapPassagers(Membre membre){
+    /**
+     * Swap de façon aléatoire les passagers
+     * @param PassagerOnVoiture
+     */
+    private static void randomSwapPassagers(PassagerOnVoiture PassagerOnVoiture){
 		int passager1 = (int)(Math.random() * 20 + 1);
 		int passager2 = (int)(Math.random() * 20 + 1);
 		Passager passagerTmp = null;
 		int[] coord1 = new int[2];
 		int[] coord2 = new int[2];
 
-        for (int i = 0; i < membre.nbVoitures(); i++) {
-        	for (int j = 0; j < membre.nbPassagers(); j++){
-        		if(membre.passagersOrdonnes[i][j].getId() == passager1){
+        for (int i = 0; i < PassagerOnVoiture.nbVoitures(); i++) {
+        	for (int j = 0; j < PassagerOnVoiture.nbPassagers(); j++){
+        		if(PassagerOnVoiture.passagersOrdonnes[i][j].getId() == passager1){
         			coord1[0] = i;
         			coord1[1] = j;
         		}
-        		if(membre.passagersOrdonnes[i][j].getId() == passager2){
+        		if(PassagerOnVoiture.passagersOrdonnes[i][j].getId() == passager2){
         			coord2[0] = i;
         			coord2[1] = j;        		
         		}		
         	}
         }
-        passagerTmp = membre.passagersOrdonnes[coord1[0]][coord1[1]];
-        membre.passagersOrdonnes[coord1[0]][coord1[1]] = membre.passagersOrdonnes[coord2[0]][coord2[1]];
-        membre.passagersOrdonnes[coord2[0]][coord2[1]] = passagerTmp;
+        passagerTmp = PassagerOnVoiture.passagersOrdonnes[coord1[0]][coord1[1]];
+        PassagerOnVoiture.passagersOrdonnes[coord1[0]][coord1[1]] = PassagerOnVoiture.passagersOrdonnes[coord2[0]][coord2[1]];
+        PassagerOnVoiture.passagersOrdonnes[coord2[0]][coord2[1]] = passagerTmp;
     }
     
-    private static Membre tournamentSelection(Population pop) {
-        // Création d'un battle royale entre plusieurs membres de la population
+    /**
+     * Création d'un battle royale entre plusieurs PassagerOnVoitures de la population
+     * @param pop
+     * @return PassagerOnVoiture gagnant !
+     */
+    private static PassagerOnVoiture tournamentSelection(Population pop) {
         Population tournament = new Population(tournamentSize, false);
         // Les participants sont tirés au sort
         for (int i = 0; i < tournamentSize; i++) {
             int randomId = (int) (Math.random() * pop.size());
-            tournament.saveMembre(i, pop.getMembre(randomId));
+            tournament.savePassagerOnVoiture(i, pop.getPassagerOnVoiture(randomId));
         }
-        // On choisi le membre gagnant !
-        Membre winner = tournament.getMoreCompetent();
-        return winner;
+        return tournament.getMoreCompetent();
     }
 }

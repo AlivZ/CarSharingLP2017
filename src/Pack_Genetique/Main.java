@@ -1,10 +1,24 @@
 package Pack_Genetique;
+
+/**
+ * Class Main qui permet de faire tourner l'algorithme.
+ * Doit à terme disparaitre.
+ * 
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Main {
 	
 	static Passager[] lesPassagers;
-    static int nbIterations = 1000;
+    static int nbIterations = 3000;
     static int nbPassager = 20;
     static int taillePopulation = 10;
+    
+    /**
+     * Main.
+     * @param args
+     */
     public static void main(String[] args) {
     	
         long debut = System.currentTimeMillis();
@@ -23,20 +37,24 @@ public class Main {
         
 
         /* Evolve our population until we reach an optimum solution*/
-        Membre meilleurMembre = null;
+        PassagerOnVoiture meilleurPassagerOnVoiture = null;
         int generationCount = 0;
         int nbIterationMeilleureSolution = 0;
-        int meilleureSolution =  myPop.getMoreCompetent().getCompetence();
+        int meilleureSolution =  myPop.getMoreCompetent().getDistanceChemin();
+        int premiereSolution = 0;
 
         while (nbIterationMeilleureSolution < nbIterations ) {
             generationCount++;
-            System.out.println("Generation: " + generationCount + " distance parcourue: " + myPop.getMoreCompetent().getCompetence()+"m");
+            System.out.println("Generation: " + generationCount + " distance parcourue: " + myPop.getMoreCompetent().getDistanceChemin()+"m");
             myPop = Algo_Genetique.evolvePopulation(myPop);
-            if (myPop.getMoreCompetent().getCompetence() < meilleureSolution){
-            	meilleureSolution = myPop.getMoreCompetent().getCompetence();
+            if (myPop.getMoreCompetent().getDistanceChemin() < meilleureSolution){
+            	meilleureSolution = myPop.getMoreCompetent().getDistanceChemin();
             	nbIterationMeilleureSolution = 0;
-            	meilleurMembre = myPop.getMoreCompetent();
+            	meilleurPassagerOnVoiture = myPop.getMoreCompetent();
             } 
+            if (generationCount == 1 ) {
+            	premiereSolution = meilleureSolution;
+            }
             else 
             	nbIterationMeilleureSolution ++;  
         }
@@ -48,14 +66,15 @@ public class Main {
         System.out.println("---------------------");
         System.out.println("Solution found ! Number of generations created : "+ generationCount);
         System.out.println("Distance: " + (float)meilleureSolution/100+" Km");
+        System.out.println("Distance au début : " + (float)premiereSolution/100+" Km");
         System.out.println("---------------------");
         System.out.println("Répartition des passagers :");
-        meilleurMembre.afficherMembres();
+        meilleurPassagerOnVoiture.afficherPassagerOnVoitures();
     
         System.out.println("---------------------");
         System.out.println("Matrice des points à parcourir : ");
 
-        meilleurMembre.afficherPoints();
+        meilleurPassagerOnVoiture.afficherPoints();
         
         long fin = System.currentTimeMillis();
         System.out.println("Méthode exécutée en " + Long.toString(fin - debut) + " millisecondes");

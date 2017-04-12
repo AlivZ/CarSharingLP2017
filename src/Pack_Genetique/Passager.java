@@ -1,11 +1,31 @@
 package Pack_Genetique;
+/**
+ * Passager de voiture.
+ * 
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Passager {
 	
-	//Chaque Passager est caractérisé par un ID unique et possède deux Points, un point de départ et un point d'arrivée
+	/**
+	 * Id unique de Passager
+	 */
 	private int id;
+	/**
+	 * Point de départ et point d'arrivée.
+	 */
 	private Point[] points = new Point[2] ;
+	/**
+	 * Nombre de passager totaux (inutile si Base de donnée : SELECT COUNT(*)
+	 */
 	private static int nbPassagers = 0;
 
+	/**
+	 * Constructeur de Passager
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	public Passager(){
 		Passager.nbPassagers ++;
 		this.id = Passager.nbPassagers;
@@ -30,15 +50,11 @@ public class Passager {
 		this.id = i;
 	}
  
-
     @Override
     public String toString() {
         String passagerString = "";
         passagerString += "Passager n°"+this.id+" position de départ: "+this.getDepart()+", destination : "+this.getArrivee(); 
         return passagerString;
     }
-
-
-
 
 }

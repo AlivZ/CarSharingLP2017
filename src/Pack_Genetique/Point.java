@@ -1,9 +1,18 @@
 package Pack_Genetique;
 
+/**
+ * Classe des postions départ et arrivée des passagers.
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Point {
 	private int pos_x;
 	private int pos_y;
 	
+	/**
+	 * Constructeur d'un point de départ ou d'arrivée.
+	 */
 	public Point(){
 		//Here we give him a random position on the 20*20 grid
 		this.pos_x = (int)(Math.random() * 20 + 1);

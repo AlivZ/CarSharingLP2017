@@ -1,54 +1,78 @@
 package Pack_Genetique;
+/**
+ * Classe Population
+ * 
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Population {
  
-    Membre[] membres;
-    /*
-     * Constructor
+	/** 
+	 * Liste de passager dans des voitures
+	 */
+    PassagerOnVoiture[] PassagerOnVoitures;
+
+    
+    /**
+     *  Create a population and PassagerOnVoiture inside
+     * @param populationSize
+     * @param initialise
+     * @version Build III -  v0.0
+     * @since Build III -  v0.0
      */
-    // Create a population
     public Population(int populationSize, boolean initialise) {
-        membres = new Membre[populationSize];
+        PassagerOnVoitures = new PassagerOnVoiture[populationSize];
         // Initialise population
         if (initialise) {
-            // Loop and create members
             for (int i = 0; i < populationSize; i++) {
-            	Membre newMembre = new Membre();
-                newMembre.generateMembre();
-                saveMembre(i, newMembre);
+            	PassagerOnVoiture newPassagerOnVoiture = new PassagerOnVoiture();
+                newPassagerOnVoiture.generatePassagerOnVoiture();
+                savePassagerOnVoiture(i, newPassagerOnVoiture);
             }
         }
     }
  
     /* Getters */
-    public Membre getMembre(int index) {
-        return membres[index];
+    public PassagerOnVoiture getPassagerOnVoiture(int index) {
+        return PassagerOnVoitures[index];
     }
  
-    public Membre getMoreCompetent() {
-    	Membre moreCompetent = membres[0];
+    public PassagerOnVoiture getMoreCompetent() {
+    	PassagerOnVoiture moreCompetent = PassagerOnVoitures[0];
         // Loop through passagers to find more competent
         for (int i = 0; i < size(); i++) {
-            if (moreCompetent.getCompetence() >= getMembre(i).getCompetence()) {
-                moreCompetent = getMembre(i);
+            if (moreCompetent.getDistanceChemin() >= getPassagerOnVoiture(i).getDistanceChemin()) {
+                moreCompetent = getPassagerOnVoiture(i);
             }
         }
         return moreCompetent;
     }
  
-    /* Public methods */
-    // Get population size
+    /**
+     *  Get population size
+     * @return
+     * @version Build III -  v0.0
+     * @since Build III -  v0.0
+     */
     public int size() {
-        return membres.length;
+        return PassagerOnVoitures.length;
     }
  
-    // Save passager
-    public void saveMembre(int index, Membre membre) {
-    	membres[index] = new Membre();
-    	for( int i = 0 ; i < membre.nbVoitures() ; i++){
-        	for( int j = 0 ; j < membre.nbPassagers() ; j++){
-    		membres[index].passagersOrdonnes[i][j] =  membre.passagersOrdonnes[i][j];
+    /**
+     *  Save passager
+     * @param index
+     * @param PassagerOnVoiture
+     * @version Build III -  v0.0
+     * @since Build III -  v0.0
+     */
+    public void savePassagerOnVoiture(int index, PassagerOnVoiture PassagerOnVoiture) {
+    	PassagerOnVoitures[index] = new PassagerOnVoiture();
+    	for( int i = 0 ; i < PassagerOnVoiture.nbVoitures() ; i++){
+        	for( int j = 0 ; j < PassagerOnVoiture.nbPassagers() ; j++){
+    		PassagerOnVoitures[index].passagersOrdonnes[i][j] =  PassagerOnVoiture.passagersOrdonnes[i][j];
         	}
     	}
-    	membres[index].attribuerPointsDePassage();
+    	PassagerOnVoitures[index].attribuerPointsDePassage();
     }
 }

@@ -5,6 +5,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.awt.Point;
 
+/**
+ * Classe simulation
+ * @author Romain Duret
+ * @version Build III -  v0.1
+ * @since Build III -  v0.0
+ *
+ */
 public class Simulation{
 
 	private int time;
@@ -26,48 +33,83 @@ public class Simulation{
 	private int carbu;
 	private Model model;
 	private City city;
+	private int occupantMax;
 	
-	/** ALGORITHME : DETERMINATION DU PARCOURS **/
-	private //Numero de l'algorithme sélectionné
-	int algoId;
-	//Numero de la fonction de coût sélectionnée
+	/**
+	 * Algorithme sélectionné
+	 */
+	private int algoId;
+	/**
+	 * Numero de la fonction de coût sélectionnée
+	 */
 	private int costRate;
-	//booléen indiquant si le crible diviser pour mieux régner doit être effectué
+	/**
+	 * booléen indiquant si le crible diviser pour mieux régner doit être effectué
+	 */
 	private boolean divide;
-	//Nombre d'étapes maximum sélectionné
+	/**
+	 * Nombre d'étapes maximum sélectionné
+	 */
 	private int stepMax;
-	//Nombre de passagers maximum
+	/**
+	 * Nombre de passagers maximum
+	 */
 	private int occupantCapacity;
+	
+	/**
+	 * "Tableau" d'itineraires <br>
+	 * Le tableau contient 3 couches : <br>
+	 * <ol>
+	 * <li> La première couche contient la liste des véhicules qui se balandent. </li>
+	 * <li> La deuxième couche contient soit un 0 soit un 1. </li>
+	 * <li> itinairaires[0][0] renvoi une liste de client. </li>
+	 * <li> itinairaires[0][1] renvoi la liste des points dans l'ordre </li>
+	 * </ol>
+	 * 
+	 * La voiture va passer par les points dans l'ordre du tableau. (puis "incrémentation" Itinairaires[0][1][0] = Itinairaires[0][1][1])
+	 */
+	private Object[][] itineraires;
+	
+	/**
+	 * Nombre de client en attente.
+	 */
+	private int clientWaitingNumber;
 
-	//Initialisation des variables
+	/**
+	 * Initialisation des variables
+	 * @param cLength
+	 * @param sLength
+	 * @param width
+	 * @param height
+	 */
 	public Simulation(int cLength, int sLength, int width, int height) {
+		this.model = new Model(cLength, sLength);
+		this.city = new City(width, height, this.model);
 		
-		this.model = new Model();
-		this.city = new City();
-		this.time = 0;
 		this.needAlgorithme = false;
+		
 		this.ListeVoitures = new ArrayList<Car>();
 		this.ListeClients = new ArrayList<Client>();
+		
 		this.nbVoituresSimulation = 0;
 		this.nbClientsSimulation = 0;
-		this.notTargettedYet = null;
-		this.carSimulation = null;
-		this.selectedClient = null;
-		city.setCityWidth(width/model.getStreetLength()+1);
-		city.setCityHeight(height/model.getStreetLength()+1);
-		city.setStreetArray(new int [city.getCityWidth()][city.getCityHeight()][2]);
-		model.setCarLength(cLength);
-		model.setStreetLength(sLength);
-		model.setCarSpeedMean(0);
-		model.setClientSpeedSum(0);
+		this.time = 0;
 		this.arrivedClient = 0;
-		model.setClientSpeedMean(0);
-		model.setClientRealSpeedMean(0);
 		this.arrivedRate = 0;
 		this.distSum = 0;
 		this.carbu = 0;
+		this.notTargettedYet = null;
+		this.carSimulation = null;
+		this.selectedClient = null;
 	}
-
+	
+	/**
+	 * Ajout d'une voiture dans la simulation.
+	 * @param CoordX
+	 * @param CoordY
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public void ajouterVoitureSimulation (int CoordX, int CoordY) {
 		this.ListeVoitures.add(new Car(CoordX,CoordY));
 		nbVoituresSimulation++;
@@ -75,31 +117,73 @@ public class Simulation{
 		this.needAlgorithme = true;
 	}
 
+	/**
+	 * Ajout d'un client dans la simulation <br>
+	 * <h3> Deux cas possible </h3>
+	 * Soit le client n'as pas encore de destination, auquel cas on rajoute une destination <br>
+	 * Soit le client a déjà une destination donc on créer un client.
+	 * @param x
+	 * @param y
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public void ajouterClientSimulation(int x,int y) {
-		//S'il y a un client dont la destination n'est pas encore définie
 		if(this.notTargettedYet != null){
-			this.notTargettedYet.getPosClient()[1] = new Point(x, y);
-			this.ListeClients.add(this.notTargettedYet);
-			this.nbClientsSimulation++;
-			this.selectedClient = this.notTargettedYet;
-			this.notTargettedYet = null;
-			if(dist(this.selectedClient.getPosClient()[0],this.selectedClient.getPosClient()[1])==0) {
-				deleteClient();
-			} else {
-				//Sinon on crée un nouveau client
-				this.needAlgorithme = true;
-				this.notTargettedYet = new Client(this.time,x,y);
+			this.newDestination(x, y);
+		} else {
+				this.newClient(x, y);
 			} 
+	}
+	
+	/**
+	 * Créer un nouveau client
+	 * @param x
+	 * @param y
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.1
+	 */
+	private void newClient(int x, int y) {
+		this.needAlgorithme = true;
+		this.notTargettedYet = new Client(this.time,x,y);
+	}
+	
+	/**
+	 * Créer la distination d'un client
+	 * @param x
+	 * @param y
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.1
+	 */
+	private void newDestination(int x, int y) {
+		this.notTargettedYet.getPosClient()[1] = new Point(x, y);
+		this.ListeClients.add(this.notTargettedYet);
+		this.nbClientsSimulation++;
+		this.selectedClient = this.notTargettedYet;
+		this.notTargettedYet = null;
+		if(dist(this.selectedClient.getPosClient()[0],this.selectedClient.getPosClient()[1])==0) {
+			deleteClient();
+		}  else {
+			this.needAlgorithme = true;
 		}
 	}
-
+	
+	/** 
+	 * Suppression d'une voiture.
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public void deleteCar(){
 		this.ListeVoitures.remove(this.carSimulation);
 		this.nbVoituresSimulation--;
 		this.carSimulation = null;
 		this.needAlgorithme = true;
 	}
-
+	
+	/**
+	 * Suppression d'un passager
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public void deleteClient(){
 		if(this.selectedClient == this.notTargettedYet){
 			this.notTargettedYet = null;
@@ -114,7 +198,11 @@ public class Simulation{
 		this.needAlgorithme = true;
 	}
 
-	//Renvoie un tableau contenant les coordonnées des voitures
+	/**
+	 * Renvoie un tableau contenant les coordonnées des voitures
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public int[] getCoordoneeDesVoitures()
 	{
 		int[] t = new int[nbVoituresSimulation*2];
@@ -126,7 +214,12 @@ public class Simulation{
 		return t;
 	}
 
-	//Renvoie un tableau contenant les coordonnées des clients
+	/**
+	 * Renvoie un tableau contenant les coordonnées des clients
+	 * @return
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
 	public int[] getCoordoneeDesClients() {
 		int[] coord = new int[this.nbClientsSimulation*4 + 2*((this.notTargettedYet!=null)?1:0)];
 		for(int l=0;l<this.nbClientsSimulation;l++) {
@@ -142,83 +235,111 @@ public class Simulation{
 		return coord;
 	}
 
-	//Fonction algorithme déterminant le parcours le moins couteux
-	public void algorithmeParcoursMoinsCouteux(){
-		//1. DEFINITION DU CADRE D'ETUDE
-		//On ne sélectionne que les voitures qui participent au covoiturage
+	
+	
+
+	/**
+<<<<<<< HEAD
+	 * On ne sélectionne que les voitures qui participent au covoiturage
+	 * @return 
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.1
+=======
+	 * Fonction algorithme déterminant le parcours le moins couteux
+	 * @deprecated Use executeAlgo instead
+>>>>>>> refs/remotes/origin/Implementation_Algorithme
+	 */
+	private ArrayList<Car> getVoitureCovoiturage() {
 		ArrayList<Car> carAlgoList = new ArrayList<Car>();
-		for(Car car: this.ListeVoitures){
-			if(car.getIsDoingCarSharing()) carAlgoList.add(car);
+		for(int i=0;i<this.ListeVoitures.size();i++) {
+			if(this.ListeVoitures.get(i).isDoingCarSharing) carAlgoList.add(this.ListeVoitures.get(i));
 		}
-		//On cherche le nombre de clients sur le trottoir
-		int clientWaitingNumber = 0;
-		//On crée la liste des clients à prendre en compte
+		return carAlgoList;
+	}
+
+	/**
+	 * Cherche le nombre de client à prendre. <br>
+	 * Et créer la liste des clients à prendre en compte. <br>
+	 * Les clients embarqués sont ajoutés en fin de liste, les autres en début.
+	 * @return
+	 */
+	private ArrayList<Client> getClientAPrendre() {
 		ArrayList<Client> clientAlgoList = new ArrayList<Client>();
 		for(Client cli: this.ListeClients){
 			if(cli.getStateClient() == 0 && cli.getIsUsingCarSharing()){
-				clientWaitingNumber++;
-				//Les clients sur le trottoir sont rajoutés au début
+				this.clientWaitingNumber++;
 				clientAlgoList.add(0,cli);
 			}
 			else if(cli.getStateClient() == 1 && cli.getIsUsingCarSharing())
-				//Les clients déjà embarqués sont rajoutés à la fin
 				clientAlgoList.add(cli);
-		}
-
-		//2. RECHERCHE DE LA MATRICE DE PASSAGE MINIMISANT LE COUT
+		}		
+		return clientAlgoList;
+	}
+	/**
+	 * Fonction qui configure l'execution de l'Algorithme.
+	 * <br>
+	 * //1. DEFINITION DU CADRE D'ETUDE
+	 * //2. RECHERCHE DE LA MATRICE DE PASSAGE MINIMISANT LE COUT
+	 * //3. CONFIGURATION DES PARCOURS DES VOITURES
+	 * @version Build III -  v0.1
+	 * @since Build III -  v0.0
+	 */
+	
+	public void executeAlgorithme(){
+		
+		this.clientWaitingNumber = 0;
+		
+		ArrayList<Car> carAlgoList = this.getVoitureCovoiturage();
+		ArrayList<Client> clientAlgoList = this.getClientAPrendre();
+		
 		int[][] matriceDePassage = searchMatriceDePassage(carAlgoList,clientAlgoList,clientWaitingNumber);
 
-		//3. CONFIGURATION DES PARCOURS DES VOITURES
 		setParcours(matriceDePassage,carAlgoList,clientAlgoList);
-		
+	
 		this.needAlgorithme = false;
 	}
-
-	//fonction déterminant la matrice de passage la moins couteuse
-	//Une matrice de passage est définie de la manière suivante
-	//taille : carNumber lignes, 2*clientAlgoNumber colonnes
-	//dans la case (k,2*l) : l'ordre de passage de la voiture k quand elle prend le client l
-	//dans la case (k,2*l+1) : l'ordre de passage de la voiture k quand elle depose le client l
-	//si la voiture k ne prend ni ne depose le client l, -1 dans les cases (k,2*l) et (k,2*l+1)
-	//Exemple :
-	//voiture 0 : prend 1, prend 0, depose 0, depose 1
-	//voiture 1 : prend 2, depose 2
-	//matriceDePassage :
-	//| 1| 2| 0| 3|-1|-1|
-	//|-1|-1|-1|-1| 0| 1|
-	int[][] searchMatriceDePassage(ArrayList<Car> carAlgoList,
+	
+	public void executeAlgo() {
+		switch (this.algoId) {
+		case 0: //déterministe
+			break;
+		case 1: //RecuitSimule
+			break;
+		case 2: //Génétique
+			break;
+		}
+	}
+	
+	/**
+	 * fonction déterminant la matrice de passage la moins couteuse <br><br>
+	 * Une matrice de passage est définie de la manière suivante : <br>
+	 * taille : carNumber lignes, 2*clientAlgoNumber colonnes <br>
+	 * dans la case (k,2*l) : l'ordre de passage de la voiture k quand elle prend le client l <br>
+	 * dans la case (k,2*l+1) : l'ordre de passage de la voiture k quand elle depose le client l <br>
+	 * si la voiture k ne prend ni ne depose le client l, -1 dans les cases (k,2*l) et (k,2*l+1) <br>
+	 * <i>Exemple : </i> <br>
+	 * voiture 0 : prend 1, prend 0, depose 0, depose 1 <br>
+	 * voiture 1 : prend 2, depose 2 <br>
+	 * matriceDePassage : <br>
+	 * | 1| 2| 0| 3|-1|-1| <br>
+	 * |-1|-1|-1|-1| 0| 1| <br>
+	 * 
+	 * @param carAlgoList
+	 * @param clientAlgoList
+	 * @param clientWaitingNumber
+	 * @return
+	 */
+	private int[][] searchMatriceDePassage(ArrayList<Car> carAlgoList,
 			ArrayList<Client> clientAlgoList, int clientWaitingNumber)
 	{
-		int carAlgoNumber = carAlgoList.size();
-		//Le nombre de clients de l'alogrithme
-		int clientAlgoNumber = clientAlgoList.size();
+		this.occupantMax = 0;
+		int carAlgoNumber = carAlgoList.size(); //Le nombre de voiture de l'alogrithme
+		int clientAlgoNumber = clientAlgoList.size(); //Le nombre de clients de l'alogrithme
 		//S'il n'y a pas de voiture ou pas de client dans le cadre d'Ã©tude, on ne lance pas l'algorithme
-		if(carAlgoNumber == 0 || clientAlgoNumber == 0) return new int[carAlgoNumber][0];
-
-		/** CREATION DE LA MATRICE DE PASSAGE INITIALE **/
-		int[][] matriceDePassage = new int[carAlgoNumber][2*clientAlgoNumber];
-		//On crée dans le même temps le tableau des occupants de la voiture renumérotés
-		int[][] carOccupantArray = new int[carAlgoNumber][];
-		//et on cherche le plus grand nombre d'occupants
-		int occupantMax = 0;
-		for(int k = 0; k<carAlgoNumber;k++){
-			ArrayList<Client> occupantList = carAlgoList.get(k).getOccupantListCar();
-			int occupantNumber = occupantList.size();
-			for(int q=0;q<2*clientAlgoNumber;q++)
-				//Les clients sur le trottoir sont rajoutés au début du parcours de la voiture 0
-				//On remplit le reste de la matrice avec des -1
-				matriceDePassage[k][q]=(k==0 && q<2*clientWaitingNumber)?q+occupantNumber:-1;
-			occupantMax = Math.max(occupantMax,occupantNumber);
-			carOccupantArray[k] = new int[occupantNumber];
-			for(int z = 0; z<occupantNumber; z++){
-				//On récupére le numero du client dans le reférentiel de l'algorithme
-				int lAlgo = clientAlgoList.indexOf((Client)occupantList.get(z));
-				//On l'ajoute dans la liste des occupants
-				carOccupantArray[k][z] = lAlgo;
-				//On l'ajoute dans le parcours de la voiture, à la suite des clients à prendre (car n°0)
-				matriceDePassage[k][2*lAlgo+1] = z;
-			}
-		}
+		if(carAlgoNumber == 0 || clientAlgoNumber == 0) return new int[0][0];
+		
+		int[][] matriceDePassage = this.creationMatriceInitiale(carAlgoList, clientAlgoList, carAlgoNumber, clientAlgoNumber);
+		
 		//On cherchera le coût minimum des matrices de passages créées
 		int costMin = cost(matriceDePassage,carAlgoList,clientAlgoList);
 
@@ -232,20 +353,66 @@ public class Simulation{
 
 		//On effectue une disjonction de cas selon l'algorithme sélectionné
 		switch(this.algoId) {
-
+			case 0: //déterministe
+				Algo_Deterministe algo = new Algo_Deterministe(costMin, clientWaitingNumber, clientAlgoNumber, carAlgoNumber,matriceDePassage, carAlgoList, clientAlgoList, this);
+				matriceDePassage = algo.launch();
+				
+				break;
+			case 1: //RecuitSimule
+				break;
+			case 2: //Génétique
+				break;
+		
 		}
-
+		/*
 		//On affiche la matrice de passage dans la console ainsi que son coût
 		System.out.println("Matrice de passage :");
 		printMatrix(matriceDePassage);
 		System.out.println("cost : "+costMin);
-
+		*/
 		return(matriceDePassage);
 	}
 
 
+	/**
+	 * Création de la matrice initiale. <br>
+	 * 
+	 * @param carAlgoList
+	 * @param clientAlgoList
+	 * @param carAlgoNumber
+	 * @param clientAlgoNumber
+	 * @return
+	 */
+	private int[][] creationMatriceInitiale(ArrayList<Car> carAlgoList,
+			ArrayList<Client> clientAlgoList, int carAlgoNumber, int clientAlgoNumber) {
+		//On crée dans le même temps le tableau des occupants de la voiture renumérotés
+		int[][] matriceDePassage = new int[carAlgoNumber][2*clientAlgoNumber];
+		int[][] carOccupantArray = new int[carAlgoNumber][]; 
+		
+		this.occupantMax = 0;
+		
+		for(int k = 0; k<carAlgoNumber;k++){ //et on cherche le plus grand nombre d'occupants
+			ArrayList<Client> occupantList = carAlgoList.get(k).getOccupantListCar();
+			int occupantNumber = occupantList.size();
+			for(int q=0;q<2*clientAlgoNumber;q++)
+				//Les clients sur le trottoir sont rajoutés au début du parcours de la voiture 0
+				//On remplit le reste de la matrice avec des -1
+			matriceDePassage[k][q]=(k==0 && q<2*clientWaitingNumber)?q+occupantNumber:-1;
+			this.occupantMax = Math.max(this.occupantMax,occupantNumber);
+			carOccupantArray[k] = new int[occupantNumber];
+			for(int z = 0; z<occupantNumber; z++){
+				//On récupére le numero du client dans le reférentiel de l'algorithme
+				int lAlgo = clientAlgoList.indexOf((Client)occupantList.get(z));
+				//On l'ajoute dans la liste des occupants
+				carOccupantArray[k][z] = lAlgo;
+				//On l'ajoute dans le parcours de la voiture, à la suite des clients à prendre (car n°0)
+				matriceDePassage[k][2*lAlgo+1] = z;
+			}
+		}
+		return matriceDePassage;
+	}
 
-	/* la fonction suivante détermine, pour un indice d'un point,
+	/** la fonction suivante détermine, pour un indice d'un point,
 	 * le nombre de clients dans la voiture juste avant d'atteindre ce point
 	 */
 	public int passagers ( int[] t, int indice) {
@@ -271,7 +438,7 @@ public class Simulation{
 		return pass;
 	}
 	
-	/* nombreDeMoinsUn détermine le nombre de cases
+	/** nombreDeMoinsUn détermine le nombre de cases
 	 * qui sont des -1 dans un tableau d'entiers
 	 */
 	public int nombreDeMoinsUn(int[] t){
@@ -281,7 +448,11 @@ public class Simulation{
 		return compteur;
 	}
 
-	// copyMatrix copie une matrice dans une nouvelle matrice
+	/** copyMatrix copie une matrice dans une nouvelle matrice
+	 * 
+	 * @param m
+	 * @return
+	 */
 	public int[][] copyMatrix(int[][] m){
 		int n = m.length;
 		int[][] mat= new int[n][m[0].length];
@@ -290,22 +461,33 @@ public class Simulation{
 		return mat;
 	}
 
-	// printMatrix affiche une matrice dans la console
+	/** printMatrix affiche une matrice dans la console
+	 * 
+	 * @param m
+	 */
 	public void printMatrix(int[][] m){
 		System.out.print("[");
 		for(int x=0;x<m.length;x++)
 			System.out.println(Arrays.toString(m[x]));
 	}
 
-	
-	/** FONCTIONS RELATIVES AU CALCUL DU COUT **/
-	//il s'agit de la distance en norme 1, nous sommes à Manhattan
-	public int dist( Point p1, Point p2)
+	/**
+	 * il s'agit de la distance en norme 1, nous sommes à Manhattan
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
+	public int dist(Point p1, Point p2)
 	{
 		return (int) (Math.abs(p1.getX()-p2.getX()) + Math.abs(p1.getY()-p2.getY()));
 	}
 
-	//recherche d'index d'une valeur dans un tableau
+	/**
+	 * recherche d'index d'une valeur dans un tableau
+	 * @param a
+	 * @param t
+	 * @return
+	 */
 	public int searchInArray(int a, int[] t)
 	{
 		for(int z = 0; z<t.length; z++)
@@ -313,7 +495,13 @@ public class Simulation{
 		return -1;
 	}
 
-	//Cette fonction calcule le cout d'un parcours défini par une matrice de passage
+	/**
+	 * Cette fonction calcule le cout d'un parcours défini par une matrice de passage
+	 * @param matriceDePassage
+	 * @param carAlgoList
+	 * @param clientAlgoList
+	 * @return
+	 */
 	public int cost(int[][] matriceDePassage, ArrayList<Car> carAlgoList, ArrayList<Client> clientAlgoList)
 	{
 		int carAlgoNumber = carAlgoList.size();
@@ -351,8 +539,12 @@ public class Simulation{
 		return cost;
 	}
 
-	//Cette fonction remplit les listes parcoursList des voitures à partir d'une matriceDePassage
-	//Logiquement cette fonction est appelée lorsqu'on a trouvé la matriceDePassage qui minimise le cout
+	/**
+	 * Cette fonction remplit les listes parcoursList des voitures à partir d'une matriceDePassage
+	 
+	* Logiquement cette fonction est appelée lorsqu'on a trouvé la matriceDePassage qui minimise le cout
+	* */
+	
 	public void setParcours(int[][] matriceDePassage,ArrayList<Car> carAlgoList, ArrayList<Client> clientAlgoList)
 	{
 		int carAlgoNumber = carAlgoList.size();
@@ -372,9 +564,9 @@ public class Simulation{
 		}
 	}
 
-
-	/** MOUVEMENTS ELEMENTAIRES **/
-	//avance les Car d'une case vers leur prochaine étape
+	/**
+	 * avance les Car d'une case vers leur prochaine étape
+	 */
 	public void OneMove() {
 		//On incrémente le temps de la simulation
 		this.time = this.time+1;
@@ -406,8 +598,8 @@ public class Simulation{
 				if(v<=0) v=(Math.random()>0.8)?1:0;
 				//On incrémente les données de simulations
 				speedSum += v;
-				this.distSum = this.distSum + v;
-				this.carbu = this.carbu + ((v== 0 || v == 1)?this.model.getCarLength()/2:v);
+				//this.distSum = this.distSum + v;
+				//this.carbu = this.carbu + ((v== 0 || v == 1)?this.model.getCarLength()/2:v);
 				if(X < p.getX()) car.getPosCar().setLocation((X+v>p.getX())?p.getX():X+v,Y);
 				else if(X > p.getX()) car.getPosCar().setLocation((X-v<p.getX())?p.getX():X-v,Y);
 				else if(Y < p.getY()) car.getPosCar().setLocation(X,(Y+v>p.getY())?p.getY():Y+v);
@@ -462,6 +654,14 @@ public class Simulation{
 	}
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	public ArrayList<Car> getListeVoitures() {
 		return ListeVoitures;
 	}
@@ -654,6 +854,8 @@ public class Simulation{
 		this.occupantCapacity = occupantCapacity;
 	}
 	
-	
+	public int getOccupantMax() {
+		return this.occupantMax;
+	}
 	
 }
