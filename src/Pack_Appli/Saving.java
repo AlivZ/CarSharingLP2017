@@ -18,14 +18,32 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 import Pack_Fenetre.Fenetre_Appli;
-//Cette classe contient des fonctions statiques permettant de lire et Ã©crire dans des fichiers txt
+/**
+ * Cette classe contient des fonctions statiques permettant de lire et Ã©crire dans des fichiers txt
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class Saving
 {
-	/** INTERACTIONS AVEC LE FICHIER **/
-	static final String fileName = "SavedSimulations.txt";
+	/** 
+	 * Fichier contenant les Simulations Sauvgardés
+	 * <br> en .txt
+	 */
+	static final String fileName = "lib/SavedSimulations.txt";
+	/**
+	 * Liste de savedSimuString <br>
+	 * <b>savedSimuString</b> : Concaténation de savedSimuName et savedSimuArray
+	 */
 	private static ArrayList<String> savedSimuList = new  ArrayList<String>();
 	
-	static File getFile(){
+	/**
+	 * Permet le fichier du fileName.
+	 * @return
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
+	static File getFile() {
 		File fichier = new File(fileName);
 		if(fichier.exists() == false)
 			try {
@@ -36,7 +54,11 @@ public class Saving
 		return fichier;
 	}
 
-	//Remplit savedSimuList des lignes du fichier
+	/**
+	 * Remplit savedSimuList des lignes du fichier
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	public static void setSavedSimuList(){
 		File f = getFile();
 		String line = "";
@@ -51,7 +73,11 @@ public class Saving
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	//RÃ©Ã©crit les lignes de savedSimuList dans le fichier
+	/**
+	 * RÃ©Ã©crit les lignes de savedSimuList dans le fichier
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	static void reWrite(){
 		File f = getFile();
 		try {
@@ -64,7 +90,10 @@ public class Saving
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
-	/** FONCTIONS D'AJOUT, DE MODIFICATION ET DE SUPPRESSION DE SIMULATIONS **/
+	/** 
+	 *  Ajout d'une simulation 
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0**/
 	static void newSavedSimu(int[][] savedSimuArray,Fenetre_Appli window){
 		String savedSimuName = (String)JOptionPane.showInputDialog(window,
 				"Veuillez entrer le nom de la simulation à enregistrer :","Nom de la simulation",
@@ -83,7 +112,13 @@ public class Saving
 			} catch (IOException e) {e.printStackTrace();}
 		}
 	}
-	
+	/**
+	 * Suppression d'une simulation
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @param n
+	 * @param window
+	 */
 	static void deleteSavedSimu(int n,Fenetre_Appli window){
 		int answer = JOptionPane.showConfirmDialog(window,"Supprimer la simulation \""
 				+savedSimuNameOfSavedSimuString(getSavedSimuList().get(n))+"\" ?", "Suppression",
@@ -94,7 +129,14 @@ public class Saving
 			reWrite();
 		}
 	}
-	
+	/**
+	 * Edition d'une simulation
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @param savedSimuArray
+	 * @param n
+	 * @param window
+	 */
 	static void editSavedSimu(int[][] savedSimuArray, int n, Fenetre_Appli window){
 		String savedSimuName = (String)JOptionPane.showInputDialog(window,
 				"Vous pouvez modifier le nom de la simulation :","Modifier le nom de la simulation",
@@ -110,11 +152,21 @@ public class Saving
 	}
 
 	
-	/** FONCTIONS DE CONVERSION **/
+	/**
+	 * Fonction qui split le string 
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 **/
 	public static String savedSimuNameOfSavedSimuString(String savedSimuString ){
 		return (savedSimuString.split("\\|"))[0];
 	}
-	
+	/**
+	 * Fonction ????
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @param savedSimuString
+	 * @return
+	 */
 	static int[][] savedSimuArrayOfSavedSimuString(String savedSimuString){
 		String[] t =(savedSimuString.split("\\|\\["))[1].replaceAll("\\]", "").split("\\[",3);
 		int[][] savedSimuArray = new int[t.length][];
@@ -136,6 +188,12 @@ public class Saving
 		return savedSimuName+"|"+aux;
 	}
 
+	/**
+	 * Getter de la liste de simulation sauvegardé
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @return
+	 */
 	public static ArrayList<String> getSavedSimuList() {
 		return savedSimuList;
 	}

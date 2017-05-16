@@ -12,20 +12,35 @@ import Pack_Simu.Car;
 import Pack_Simu.Client;
 
 
-//CityBoard est l'élément central représentant la ville
+/**
+ * CityBoard est l'élément représentant la ville
+ * La classe permet de représenter visuellement les différents élements.
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ */
 public class CityBoard extends JPanel
 {
 	private static final long serialVersionUID = -4239432318493357189L;
 	
-	/**TAILLE DU WIDGET**/
+	/*TAILLE DU WIDGET*/
 	private final int boardWidth = 25;
 	private final int boardHeight = 25;
 	private final int squareSize = 20;
 	
-	//on enregistre dans ce champ l'adresse de l'application pour accéder aux variables de simulation
-	Application app;
+	/**
+	 *  adresse de l'application pour accéder aux variables de simulation
+	 */
+	private Application app;
 	
-	CityBoard(Application consApp){
+	/**
+	 * Création d'un objet CityBoard.
+	 * 
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @param consApp
+	 */
+	protected CityBoard(Application consApp){
 		Dimension boardDimension = new Dimension(getBoardWidth() * getSquareSize(),getBoardHeight() * getSquareSize());
 		//La taille du Panel est fixée à  sa dimension initiale
 		setMinimumSize(boardDimension);
@@ -37,8 +52,13 @@ public class CityBoard extends JPanel
 	}
 	
 	
-	/** DESSIN **/
-	//dessine le cityboard, appelé par la fonction repaint()
+	/* DESSIN */
+	/**
+	 * dessine le cityboard, appelé par la fonction repaint()(non-Javadoc)
+	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	public void paintComponent(Graphics g)
 	{
 		g.setColor(Color.WHITE);
@@ -60,7 +80,11 @@ public class CityBoard extends JPanel
 		}
 	}
 	
-	//Dessine une voiture au point p
+	/**
+	 * Dessine une voiture au point p
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	void drawCar(Graphics g, Car car)
 	{
 		g.setColor((car.getIsDoingCarSharing())?Color.RED:Color.GREEN);
@@ -76,7 +100,13 @@ public class CityBoard extends JPanel
 		drawId(g,car.getIdCar(),x,y);
 	}
 
-	//Dessine la position d'un client sur le trottoir
+	/**
+	 * Dessine la position d'un client sur le trottoir
+	 * @param g
+	 * @param cli
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	void drawClientPos(Graphics g, Client cli){
 		g.setColor(Color.BLUE);
 		int x = (int) (cli.getPosClient()[0].getX()/getSquareSize()*getSquareSize());
@@ -89,7 +119,13 @@ public class CityBoard extends JPanel
 		drawId(g,cli.getIdClient(),x,y);
 	}
 
-	//Dessine la destination d'un client
+	/**
+	 * Dessine la destination d'un client
+	 * @param g
+	 * @param cli
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	void drawClientTarget(Graphics g, Client cli)
 	{
 		g.setColor((cli.getIsUsingCarSharing())?Color.BLUE:Color.CYAN);
@@ -102,23 +138,42 @@ public class CityBoard extends JPanel
 		drawId(g,cli.getIdClient(),x,y);
 	}
 	
-	//Dessine le numéro de la voiture ou du client
+	/**
+	 * Dessine le numéro de la voiture ou du client
+	 * @param g
+	 * @param id
+	 * @param x
+	 * @param y
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 */
 	void drawId(Graphics g, int id, int x, int y){
 		g.setColor(Color.BLACK);
 		g.drawString(""+id,x + getSquareSize()/3, y + getSquareSize());
 	}
 
-
+	/**
+	 * Récupère la taille des carrés
+	 * @version Build III -  v0.0
+	 * @since Build III -  v0.0
+	 * @return
+	 */
 	public int getSquareSize() {
 		return squareSize;
 	}
 
-
+	/**
+	 * 
+	 * @return
+	 */
 	public int getBoardWidth() {
 		return boardWidth;
 	}
 
-
+	/**
+	 * 
+	 * @return
+	 */
 	public int getBoardHeight() {
 		return boardHeight;
 	}

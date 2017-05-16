@@ -3,24 +3,38 @@ package Pack_Simu;
 import java.awt.Point;
 
 
-//La classe client représente un voyageur
+/** 
+ * La classe client représente un voyageur
+ * @author Romain Duret
+ * @version Build III -  v0.0
+ * @since Build III -  v0.0
+ *
+ */
 public class Client
 {
 	private int idClient;
 	int appearanceMoment;
+	/**
+	 * @see PositionPassager
+	 */
 	private Point[] posClient;
-	//Index de pos :
-	//0 position du client
-	//1 destination du client
+	/**
+	 * Etat du client. <br>
+	 * <ol> <li> Sur le trottoire </li>
+	 * <li> Dans la voiture </li>
+	 * </ol>
+	 */
 	int stateClient;
-	//state :
-	//0 sur le trottoir
-	//1 dans la voiture
-	//2 arrivé
 	private Car carClient;
 	private boolean isUsingCarSharing;
 	private static int idcptClient=0; 
 
+	/**
+	 * Constructeur du client.
+	 * @param time
+	 * @param coordX
+	 * @param coordY
+	 */
 	Client(int time, int coordX, int coordY){
 		this.idClient = idcptClient;
 		this.appearanceMoment = time;
@@ -29,6 +43,15 @@ public class Client
 		this.stateClient = 0;
 		this.isUsingCarSharing = true;
 		idcptClient++;
+	}
+	
+	/**
+	 * To String
+	 * @return l'id sous forme de string
+	 */
+	public String toString() {
+		String test = Integer.toString(this.idClient);
+		return test;
 	}
 	
 	public int getStateClient () {
